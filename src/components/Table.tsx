@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   useGetOrdersQuery,
   useAddOrderMutation,
@@ -8,9 +8,6 @@ import {
 } from "../store/orders.api";
 
 import { alpha } from "@mui/material/styles";
-import Alert from "@mui/material/Alert";
-import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
-import CloseIcon from "@mui/icons-material/Close";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -32,6 +29,8 @@ import TextField from "@mui/material/TextField";
 import AddCircleTwoToneIcon from "@mui/icons-material/AddCircleTwoTone";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
+
+import SnackbarAlert from "./SnackbarAlert";
 
 interface Data {
   id: number;
@@ -202,7 +201,6 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   );
 }
 
-// Styles for the modal
 const modalStyle = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -231,7 +229,8 @@ export default function EnhancedTable() {
   const [updateOrder] = useUpdateOrderMutation();
   const [deleteOrder] = useDeleteOrderMutation();
 
-  const [open, setOpen] = React.useState(false);
+  const snackbarRefDelete = useRef<any>(null);
+  const snackbarRefUpdate = useRef<any>(null);
 
   const handleAddOrder = async (order: {
     id: number;
@@ -258,6 +257,7 @@ export default function EnhancedTable() {
   ) => {
     try {
       await updateOrder({ id, ...updatedData }).unwrap();
+      handleOpenUpdateSnackbar();
     } catch (error) {
       console.error("Failed to update order:", error);
     }
@@ -266,14 +266,8 @@ export default function EnhancedTable() {
   const handleDeleteOrder = async (id: string) => {
     await deleteOrder(id).unwrap();
     handleCloseModal();
-    handleOpenSnackbar();
+    handleOpenDeleteSnackbar();
   };
-
-  //   const handleUpdateOrder = async (order: { id: number; username: string; status: string; createdAt: string }) => {
-  //     if (order.id) {
-  //       console.log("Order updated:", order);
-  //     }
-  //   };
 
   if (isLoading) return <h1>Loading...</h1>;
 
@@ -308,37 +302,28 @@ export default function EnhancedTable() {
 
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
-  // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
-  const handleOpenSnackbar = () => {
-    setOpen(true);
-  };
-
-  const handleCloseSnackbar = (
-    event: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason
-  ) => {
-    if (reason === "clickaway") {
-      return;
+  const triggerSnackbarDelete = () => {
+    if (snackbarRefDelete.current) {
+      snackbarRefDelete.current.openSnackbar();
     }
-
-    setOpen(false);
   };
 
-  const action = (
-    <React.Fragment>
-      <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={handleCloseSnackbar}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </React.Fragment>
-  );
+  const triggerSnackbarUpdate = () => {
+    if (snackbarRefUpdate.current) {
+      snackbarRefUpdate.current.openSnackbar();
+    }
+  };
+
+  const handleOpenDeleteSnackbar = () => {
+    triggerSnackbarDelete();
+  };
+
+  const handleOpenUpdateSnackbar = () => {
+    triggerSnackbarUpdate();
+  };
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -422,7 +407,6 @@ export default function EnhancedTable() {
         <AddCircleTwoToneIcon />
       </IconButton>
 
-      {/* Modal Window */}
       <Modal
         open={openModal}
         onClose={handleCloseModal}
@@ -434,7 +418,6 @@ export default function EnhancedTable() {
             {selectedRow ? "Edit Order" : "Add New Order"}
           </Typography>
 
-          {/* Input Fields for Order Details */}
           <Box component="form" noValidate autoComplete="off">
             <TextField
               label="ID"
@@ -446,7 +429,7 @@ export default function EnhancedTable() {
               }
               fullWidth
               margin="normal"
-              disabled={!!selectedRow} // Disable ID input if editing an existing order
+              disabled={!!selectedRow}
             />
             <TextField
               label="Username"
@@ -480,11 +463,10 @@ export default function EnhancedTable() {
               }
               fullWidth
               margin="normal"
-              disabled={!!selectedRow} // Disable if editing an existing order
+              disabled={!!selectedRow}
             />
           </Box>
 
-          {/* Delete Button */}
           {selectedRow && (
             <IconButton
               onClick={() => handleDeleteOrder(selectedRow.id.toString())}
@@ -493,11 +475,9 @@ export default function EnhancedTable() {
             </IconButton>
           )}
 
-          {/* Submit Button */}
           <Button
             onClick={() => {
               if (selectedRow) {
-                // Update the existing order
                 handleUpdateOrder(selectedRow.id.toString(), {
                   username: selectedRow.username,
                   status: selectedRow.status,
@@ -505,7 +485,6 @@ export default function EnhancedTable() {
                 });
                 console.log("Order was updated");
               } else {
-                // Add a new order
                 handleAddOrder({
                   id: Date.now(),
                   username: "",
@@ -515,7 +494,7 @@ export default function EnhancedTable() {
                 console.log("Order was added");
               }
               handleCloseModal();
-              setSelectedRow(null); // Reset selectedRow after closing the modal
+              setSelectedRow(null);
             }}
             variant="contained"
             sx={{ mt: 2 }}
@@ -525,20 +504,8 @@ export default function EnhancedTable() {
         </Box>
       </Modal>
 
-      <Snackbar
-        open={open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        action={action}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
-          Deleted
-        </Alert>
-      </Snackbar>
+      <SnackbarAlert ref={snackbarRefDelete} text="Deleted" type="error" />
+      <SnackbarAlert ref={snackbarRefUpdate} text="Update" type="info" />
     </Box>
   );
 }
