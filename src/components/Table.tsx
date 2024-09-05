@@ -221,9 +221,12 @@ export default function EnhancedTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [openModal, setOpenModal] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<Data | null>(null);
+  const [requestType, setRequestType] = useState("");
 
   const [count, setCount] = useState("");
-  const [newOrder, setNewOrder] = useState("");
+  const [newOrderId, setNewOrderId] = useState("");
+  const [newOrderName, setNewOrderName] = useState("");
+  const [newOrderStatus, setNewOrderStatus] = useState("");
   const { data = [], isLoading } = useGetOrdersQuery(count);
   const [addOrder, { isError }] = useAddOrderMutation();
   const [updateOrder] = useUpdateOrderMutation();
@@ -231,25 +234,25 @@ export default function EnhancedTable() {
 
   const snackbarRefDelete = useRef<any>(null);
   const snackbarRefUpdate = useRef<any>(null);
+  const snackbarRefAdd = useRef<any>(null);
 
-  const handleAddOrder = async (order: {
-    id: number;
-    username: string;
-    status: string;
-    createdAt: string;
-  }) => {
-    if (newOrder) {
-      await addOrder({ username: newOrder }).unwrap();
-      setNewOrder("");
+  const handleAddOrder = async () => {
+    try {
+      if (newOrderId && newOrderName && newOrderStatus) {
+        await addOrder({
+          id: newOrderId,
+          username: newOrderName,
+          status: newOrderStatus,
+        }).unwrap();
+        setNewOrderId("");
+        setNewOrderName("");
+        setNewOrderStatus("");
+        triggerSnackbarAdd();
+      }
+    } catch (error) {
+      console.error("Failed to add new order:", error);
     }
   };
-
-  //   const handleAddOrder = async (order: { id: number; username: string; status: string; createdAt: string }) => {
-  //     if (order.username) {
-  //       await addOrder(order).unwrap();
-  //       setNewOrder("");
-  //     }
-  //   };
 
   const handleUpdateOrder = async (
     id: string,
@@ -280,9 +283,15 @@ export default function EnhancedTable() {
     setOrderBy(property);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, row: Data) => {
+  const handleClick = (
+    event: React.MouseEvent<unknown>,
+    row: Data,
+    request: string
+  ) => {
+    setRequestType(request);
     setSelectedRow(row);
     setOpenModal(true);
+    console.log(request);
   };
 
   const handleCloseModal = () => {
@@ -314,6 +323,12 @@ export default function EnhancedTable() {
   const triggerSnackbarUpdate = () => {
     if (snackbarRefUpdate.current) {
       snackbarRefUpdate.current.openSnackbar();
+    }
+  };
+
+  const triggerSnackbarAdd = () => {
+    if (snackbarRefAdd.current) {
+      snackbarRefAdd.current.openSnackbar();
     }
   };
 
@@ -354,7 +369,7 @@ export default function EnhancedTable() {
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row)}
+                      onClick={(event) => handleClick(event, row, "get")}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
@@ -395,12 +410,16 @@ export default function EnhancedTable() {
 
       <IconButton
         onClick={(event) => {
-          handleClick(event, {
-            id: 0,
-            username: "",
-            status: "",
-            createdAt: "",
-          });
+          handleClick(
+            event,
+            {
+              id: 0,
+              username: "",
+              status: "",
+              createdAt: "",
+            },
+            "add"
+          );
         }}
       >
         <span>Add new orders</span>
@@ -422,45 +441,47 @@ export default function EnhancedTable() {
             <TextField
               label="ID"
               value={selectedRow ? selectedRow.id : ""}
-              onChange={(e) =>
+              onChange={(e) => {
                 setSelectedRow((prev) =>
                   prev ? { ...prev, id: parseInt(e.target.value, 10) } : null
-                )
-              }
+                );
+                setNewOrderId(e.target.value);
+              }}
               fullWidth
               margin="normal"
-              disabled={!!selectedRow}
             />
             <TextField
               label="Username"
               value={selectedRow ? selectedRow.username : ""}
-              onChange={(e) =>
+              onChange={(e) => {
                 setSelectedRow((prev) =>
                   prev ? { ...prev, username: e.target.value } : null
-                )
-              }
+                );
+                setNewOrderName(e.target.value);
+              }}
               fullWidth
               margin="normal"
             />
             <TextField
               label="Status"
               value={selectedRow ? selectedRow.status : ""}
-              onChange={(e) =>
+              onChange={(e) => {
                 setSelectedRow((prev) =>
                   prev ? { ...prev, status: e.target.value } : null
-                )
-              }
+                );
+                setNewOrderStatus(e.target.value);
+              }}
               fullWidth
               margin="normal"
             />
             <TextField
               label="Created At"
               value={selectedRow ? selectedRow.createdAt : ""}
-              onChange={(e) =>
+              onChange={(e) => {
                 setSelectedRow((prev) =>
                   prev ? { ...prev, createdAt: e.target.value } : null
-                )
-              }
+                );
+              }}
               fullWidth
               margin="normal"
               disabled={!!selectedRow}
@@ -477,7 +498,7 @@ export default function EnhancedTable() {
 
           <Button
             onClick={() => {
-              if (selectedRow) {
+              if (selectedRow && requestType === "get") {
                 handleUpdateOrder(selectedRow.id.toString(), {
                   username: selectedRow.username,
                   status: selectedRow.status,
@@ -485,12 +506,7 @@ export default function EnhancedTable() {
                 });
                 console.log("Order was updated");
               } else {
-                handleAddOrder({
-                  id: Date.now(),
-                  username: "",
-                  status: "",
-                  createdAt: new Date().toISOString(),
-                });
+                handleAddOrder();
                 console.log("Order was added");
               }
               handleCloseModal();
@@ -499,13 +515,14 @@ export default function EnhancedTable() {
             variant="contained"
             sx={{ mt: 2 }}
           >
-            {selectedRow ? "Update Order" : "Add Order"}
+            {requestType === "get" ? "Update Order" : "Add Order"}
           </Button>
         </Box>
       </Modal>
 
       <SnackbarAlert ref={snackbarRefDelete} text="Deleted" type="error" />
-      <SnackbarAlert ref={snackbarRefUpdate} text="Update" type="info" />
+      <SnackbarAlert ref={snackbarRefUpdate} text="Updated" type="info" />
+      <SnackbarAlert ref={snackbarRefAdd} text="Added" type="success" />
     </Box>
   );
 }
