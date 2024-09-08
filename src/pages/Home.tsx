@@ -5,9 +5,16 @@ import { AuthContext } from "../context/AuthContext";
 function Home() {
   const authContext = useContext(AuthContext);
 
+  const logOut = () => {
+    localStorage.setItem("accessToken", "");
+    localStorage.setItem("refreshToken", "");
+
+    window.location.href = "/sign-in";
+  };
+
   return (
     <section id="home" className="home">
-      <button onClick={authContext?.logout}>Log out</button>
+      <button onClick={logOut}>Log out</button>
       <EnhancedTable />
     </section>
   );
