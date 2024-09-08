@@ -1,7 +1,5 @@
 import * as React from "react";
-import { useState, useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -73,17 +71,12 @@ export default function SignIn() {
     username: "",
     password: "",
   });
-  const authContext = useContext(AuthContext);
-  const navigate = useNavigate();
 
-  // This code only runs on the client side, to determine the system color preference
   React.useEffect(() => {
-    // Check if there is a preferred mode in localStorage
     const savedMode = localStorage.getItem("themeMode") as PaletteMode | null;
     if (savedMode) {
       setMode(savedMode);
     } else {
-      // If no preference is found, it uses system preference
       const systemPrefersDark = window.matchMedia(
         "(prefers-color-scheme: dark)"
       ).matches;
@@ -94,7 +87,7 @@ export default function SignIn() {
   const toggleColorMode = () => {
     const newMode = mode === "dark" ? "light" : "dark";
     setMode(newMode);
-    localStorage.setItem("themeMode", newMode); // Save the selected mode to localStorage
+    localStorage.setItem("themeMode", newMode);
   };
 
   const toggleCustomTheme = () => {
@@ -108,24 +101,6 @@ export default function SignIn() {
   const handleClose = () => {
     setOpen(false);
   };
-
-  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
-  //   const data = new FormData(event.currentTarget);
-  //   console.log({
-  //     email: data.get("email"),
-  //     password: data.get("password"),
-  //   });
-  // };
-
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (authContext && authContext.login(data.email, data.password)) {
-  //     navigate("/home");
-  //   } else {
-  //     alert("Invalid credentials");
-  //   }
-  // };
 
   const handleSubmit = (e: React.FormEvent) => {
     try {
@@ -142,7 +117,10 @@ export default function SignIn() {
           headers: { "Content-Type": "application/json" },
         })
         .then((response) => {
-          console.log("This is the response data (string):", JSON.stringify(response.data, null, 2));
+          console.log(
+            "This is the response data (string):",
+            JSON.stringify(response.data, null, 2)
+          );
 
           if (response.status === 200) {
             localStorage.setItem("accessToken", response.data.token);
@@ -222,7 +200,7 @@ export default function SignIn() {
             </Typography>
             <Box
               component="form"
-              onSubmit={handleSubmit}
+              onSubmit={validateInputs}
               noValidate
               sx={{
                 display: "flex",

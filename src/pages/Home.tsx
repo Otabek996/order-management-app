@@ -1,5 +1,5 @@
 import EnhancedTable from "../components/Table";
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 function Home() {
