@@ -1,4 +1,7 @@
 import * as React from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -20,8 +23,10 @@ import {
 } from "@mui/material/styles";
 import ForgotPassword from "./ForgotPassword";
 import getSignInTheme from "./theme/getSignInTheme";
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from "./CustomIcons";
+import { GoogleIcon, FacebookIcon } from "./CustomIcons";
 import TemplateFrame from "./TemplateFrame";
+import axios from "axios";
+import { BASE_USERS_URL } from "../../constants/api.constants";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -64,6 +69,12 @@ export default function SignIn() {
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
+  const [data, setData] = useState({
+    username: "",
+    password: "",
+  });
+  const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
 
   // This code only runs on the client side, to determine the system color preference
   React.useEffect(() => {
@@ -98,13 +109,61 @@ export default function SignIn() {
     setOpen(false);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+  //   const data = new FormData(event.currentTarget);
+  //   console.log({
+  //     email: data.get("email"),
+  //     password: data.get("password"),
+  //   });
+  // };
+
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (authContext && authContext.login(data.email, data.password)) {
+  //     navigate("/home");
+  //   } else {
+  //     alert("Invalid credentials");
+  //   }
+  // };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    try {
+      e.preventDefault();
+      const userData = {
+        username: data.username,
+        password: data.password,
+        expiresInMins: 30,
+      };
+      console.log(userData);
+
+      axios
+        .post(BASE_USERS_URL, userData, {
+          headers: { "Content-Type": "application/json" },
+        })
+        .then((response) => {
+          console.log("This is the response data (string):", JSON.stringify(response.data, null, 2));
+
+          if (response.status === 200) {
+            localStorage.setItem("accessToken", response.data.token);
+            localStorage.setItem("refreshToken", response.data.refreshToken);
+
+            window.location.href = "/";
+          }
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.log(error.response);
+            console.log("server responded");
+          } else if (error.request) {
+            console.log("network error");
+          } else {
+            console.log(error);
+          }
+        });
+    } catch (error) {
+      console.error("Error logging in:", error);
+    }
   };
 
   const validateInputs = () => {
@@ -132,6 +191,15 @@ export default function SignIn() {
     }
 
     return isValid;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    setData({
+      ...data,
+      [e.target.name]: value,
+    });
   };
 
   return (
@@ -164,21 +232,23 @@ export default function SignIn() {
               }}
             >
               <FormControl>
-                <FormLabel htmlFor="email">Email</FormLabel>
+                <FormLabel htmlFor="username">username</FormLabel>
                 <TextField
                   error={emailError}
                   helperText={emailErrorMessage}
-                  id="email"
+                  id="username"
                   type="email"
-                  name="email"
+                  name="username"
                   placeholder="your@email.com"
-                  autoComplete="email"
+                  autoComplete="username"
                   autoFocus
                   required
                   fullWidth
                   variant="outlined"
                   color={emailError ? "error" : "primary"}
                   sx={{ ariaLabel: "email" }}
+                  value={data.username}
+                  onChange={handleChange}
                 />
               </FormControl>
               <FormControl>
@@ -206,6 +276,8 @@ export default function SignIn() {
                   fullWidth
                   variant="outlined"
                   color={passwordError ? "error" : "primary"}
+                  value={data.password}
+                  onChange={handleChange}
                 />
               </FormControl>
               <FormControlLabel
@@ -217,7 +289,7 @@ export default function SignIn() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                onClick={validateInputs}
+                onClick={handleSubmit}
               >
                 Sign in
               </Button>
