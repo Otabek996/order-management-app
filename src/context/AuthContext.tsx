@@ -1,6 +1,6 @@
 // src/context/AuthContext.tsx
 import { createContext, useState, ReactNode } from 'react';
-import { authenticate } from '../utils/AuthService';  // Import authenticate
+import { authenticate } from '../utils/AuthService';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   const login = (username: string, password: string): boolean => {
-    const success = authenticate(username, password);  // Call authenticate
+    const success = authenticate(username, password);
     if (success) setIsAuthenticated(true);
     return success;
   };
