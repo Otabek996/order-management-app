@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/order-management-app/static/css/main.31d6cfe0.css",
+    "main.js": "/order-management-app/static/js/main.18ab6555.js",
+    "static/js/453.22082cb8.chunk.js": "/order-management-app/static/js/453.22082cb8.chunk.js",
+    "index.html": "/order-management-app/index.html",
+    "main.18ab6555.js.map": "/order-management-app/static/js/main.18ab6555.js.map",
+    "453.22082cb8.chunk.js.map": "/order-management-app/static/js/453.22082cb8.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.31d6cfe0.css",
+    "static/js/main.18ab6555.js"
+  ]
+}
