@@ -1,10 +1,6 @@
 import EnhancedTable from "../components/Table";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
 
 function Home() {
-  const authContext = useContext(AuthContext);
-
   const logOut = () => {
     localStorage.setItem("accessToken", "");
     localStorage.setItem("refreshToken", "");
