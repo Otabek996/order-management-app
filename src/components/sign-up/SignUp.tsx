@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
@@ -19,7 +18,6 @@ import {
   PaletteMode,
 } from "@mui/material/styles";
 import getSignUpTheme from "./theme/getSignUpTheme";
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from "./CustomIcons";
 import TemplateFrame from "./TemplateFrame";
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -239,29 +237,6 @@ export default function SignUp() {
                     </Link>
                   </span>
                 </Typography>
-              </Box>
-              <Divider>
-                <Typography sx={{ color: "text.secondary" }}>or</Typography>
-              </Divider>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="outlined"
-                  onClick={() => alert("Sign up with Google")}
-                  startIcon={<GoogleIcon />}
-                >
-                  Sign up with Google
-                </Button>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="outlined"
-                  onClick={() => alert("Sign up with Facebook")}
-                  startIcon={<FacebookIcon />}
-                >
-                  Sign up with Facebook
-                </Button>
               </Box>
             </Card>
           </Stack>

@@ -5,7 +5,6 @@ import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import CssBaseline from "@mui/material/CssBaseline";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Divider from "@mui/material/Divider";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
 import Link from "@mui/material/Link";
@@ -21,7 +20,6 @@ import {
 } from "@mui/material/styles";
 import ForgotPassword from "./ForgotPassword";
 import getSignInTheme from "./theme/getSignInTheme";
-import { GoogleIcon, FacebookIcon } from "./CustomIcons";
 import TemplateFrame from "./TemplateFrame";
 import axios from "axios";
 import { BASE_USERS_URL } from "../../constants/api.constants";
@@ -283,27 +281,6 @@ export default function SignIn() {
                   </Link>
                 </span>
               </Typography>
-            </Box>
-            <Divider>or</Divider>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Button
-                type="submit"
-                fullWidth
-                variant="outlined"
-                onClick={() => alert("Sign in with Google")}
-                startIcon={<GoogleIcon />}
-              >
-                Sign in with Google
-              </Button>
-              <Button
-                type="submit"
-                fullWidth
-                variant="outlined"
-                onClick={() => alert("Sign in with Facebook")}
-                startIcon={<FacebookIcon />}
-              >
-                Sign in with Facebook
-              </Button>
             </Box>
           </Card>
         </SignInContainer>
