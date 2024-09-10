@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/order-management-app/static/css/main.31d6cfe0.css",
-    "main.js": "/order-management-app/static/js/main.a456f37b.js",
+    "main.js": "/order-management-app/static/js/main.a20b57ec.js",
     "static/js/453.939d0314.chunk.js": "/order-management-app/static/js/453.939d0314.chunk.js",
     "index.html": "/order-management-app/index.html",
-    "main.a456f37b.js.map": "/order-management-app/static/js/main.a456f37b.js.map",
+    "main.a20b57ec.js.map": "/order-management-app/static/js/main.a20b57ec.js.map",
     "453.939d0314.chunk.js.map": "/order-management-app/static/js/453.939d0314.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.31d6cfe0.css",
-    "static/js/main.a456f37b.js"
+    "static/js/main.a20b57ec.js"
   ]
 }
