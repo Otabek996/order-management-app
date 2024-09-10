@@ -58,5 +58,8 @@
   "main": "index.js",
   "repository": "git@github.com:Otabek996/order-management-app.git",
   "author": "Tuychiev Otabek <otabekotabek996996@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+  }
 }
