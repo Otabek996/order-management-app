@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const refreshToken = localStorage.getItem("refreshToken");
 
   if (!authContext?.isAuthenticated && (!accessToken || !refreshToken)) {
-    return <Navigate to="/sign-in" />;
+    return <Navigate to="/order-management-app/sign-in" />;
   }
 
   return children;

@@ -7,9 +7,9 @@ import ProtectedRoute from "./layout/ProtectedRoute";
 function App() {
   return (
     <Routes>
-      <Route path="/sign-in" element={<Authorization />} />
+      <Route path="/order-management-app/sign-in" element={<Authorization />} />
       <Route
-        path="/"
+        path="/order-management-app"
         element={
           <ProtectedRoute>
             <Home />
@@ -17,7 +17,7 @@ function App() {
         }
       />
       <Route
-        path="/sign-up"
+        path="/order-management-app/sign-up"
         element={
           <ProtectedRoute>
             <Authentication />

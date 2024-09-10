@@ -23,6 +23,7 @@ import getSignInTheme from "./theme/getSignInTheme";
 import TemplateFrame from "./TemplateFrame";
 import axios from "axios";
 import { BASE_USERS_URL } from "../../constants/api.constants";
+import { Navigate } from "react-router-dom";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -124,7 +125,8 @@ export default function SignIn() {
             localStorage.setItem("accessToken", response.data.token);
             localStorage.setItem("refreshToken", response.data.refreshToken);
 
-            window.location.href = "/";
+            // window.location.href = "/order-management-app";
+            <Navigate to="/order-management-app" />;
           }
         })
         .catch((error) => {
