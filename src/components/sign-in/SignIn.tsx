@@ -23,7 +23,7 @@ import getSignInTheme from "./theme/getSignInTheme";
 import TemplateFrame from "./TemplateFrame";
 import axios from "axios";
 import { BASE_USERS_URL } from "../../constants/api.constants";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -70,6 +70,7 @@ export default function SignIn() {
     username: "",
     password: "",
   });
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const savedMode = localStorage.getItem("themeMode") as PaletteMode | null;
@@ -109,7 +110,6 @@ export default function SignIn() {
         password: data.password,
         expiresInMins: 30,
       };
-      console.log(userData);
 
       axios
         .post(BASE_USERS_URL, userData, {
@@ -125,8 +125,7 @@ export default function SignIn() {
             localStorage.setItem("accessToken", response.data.token);
             localStorage.setItem("refreshToken", response.data.refreshToken);
 
-            // window.location.href = "/order-management-app";
-            <Navigate to="/order-management-app" />;
+            navigate("/order-management-app");
           }
         })
         .catch((error) => {
